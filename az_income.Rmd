@@ -1,0 +1,85 @@
+---
+title: "Arizona Income Study"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+# I used library to load up all the packages that I was going to use for this
+# problem set. I separately loaded the tidycensus library because I wanted to
+# make sure that the census_api_key gets properly loaded for the data to
+# correctly show. There are some libraries that I ended up not using, but I
+# loaded them just in case (this was before actually solving all the problems).
+
+# use library to load packages
+
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(gt)
+library(rvest)
+library(forcats)
+library(stringr)
+library(magrittr)
+
+# disable scientific notation 
+options(scipen = 999)
+
+# load tidycensus library
+
+library(tidycensus)
+
+census_api_key("b2de32ee89e12c83cd328327c41e418792015c20")
+
+```
+
+```{r, include = FALSE}
+
+# I put include = FALSE because the notice on loading the 5-year ACS kept
+# popping up in the knitted version, and I only needed to have load up data for
+# California to successfully graph for the second problem. In terms of how I
+# structured get_acs, I used the information shown on the textbook with Harris
+# County and modified that slighlty with the variables set to median income. I
+# don't imagine to have done this problem in any different fashion.
+
+
+# define what california is by geography and income levels
+
+# use include = false so geometry and FIPS data download doesn't show every time
+
+arizona <- get_acs(geography = "county",
+                  variables = "B19013_001", 
+                  year = 2018,
+                  state = "AZ",
+                  geometry = TRUE) 
+
+```
+
+
+```{r, echo=FALSE}
+
+# After setting up for the AZ database, now the issue was doing the
+# ggplot to get the colors right with the right labels and data. I used the
+# textbook again for inspiration on how to get the color scheme and the geom
+# correctly. Given that this was largely derived from how the textbook has done
+# it, I don't think I would have done the graphing any different way.
+
+# ggplot the AZ data, which has median income
+
+az_map <- arizona %>%
+  ggplot(aes(fill = estimate)) +
+  geom_sf() + 
+  scale_fill_viridis_c(option = "plasma",
+                       direction = -1) +
+  labs(title = "Median Income by County in Arizona",
+       caption = "Source: American Communities Survey 2018",
+       fill = "Median Income") +
+  theme_void()
+
+print(az_map)
+
+```
